@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+:root {
+  --neon: #3746ff;
+  --neon-glow: rgba(55, 70, 255, 0.45);
+  --bg: #06060b;
+  --surface: #0e0e16;
+  --surface-2: #14141f;
+  --border: rgba(55, 70, 255, 0.25);
+  --text: #e8e8f0;
+  --muted: #8888a0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+.neon-text {
+  color: var(--neon);
+  text-shadow: 0 0 20px var(--neon-glow), 0 0 40px rgba(55, 70, 255, 0.2);
+}
+
+.neon-border {
+  border: 1px solid var(--border);
+  box-shadow: 0 0 12px rgba(55, 70, 255, 0.08), inset 0 0 12px rgba(55, 70, 255, 0.03);
+}
+
+.neon-btn {
+  background: var(--neon);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.15s;
+  box-shadow: 0 0 20px var(--neon-glow);
+}
+
+.neon-btn:hover:not(:disabled) {
+  box-shadow: 0 0 30px var(--neon-glow), 0 0 60px rgba(55, 70, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.neon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.neon-btn-outline {
+  background: transparent;
+  color: var(--neon);
+  border: 1px solid var(--neon);
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.neon-btn-outline:hover:not(:disabled) {
+  background: rgba(55, 70, 255, 0.1);
+  box-shadow: 0 0 20px var(--neon-glow);
+}
+
+.drop-zone-active {
+  border-color: var(--neon) !important;
+  background: rgba(55, 70, 255, 0.06) !important;
+  box-shadow: 0 0 30px var(--neon-glow) !important;
+}
+
+@keyframes pulse-neon {
+  0%, 100% { box-shadow: 0 0 12px var(--neon-glow); }
+  50% { box-shadow: 0 0 24px var(--neon-glow), 0 0 48px rgba(55, 70, 255, 0.15); }
+}
+
+.pulse-neon {
+  animation: pulse-neon 2s ease-in-out infinite;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--neon);
+  border-radius: 3px;
+}

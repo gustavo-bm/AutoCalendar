@@ -1,6 +1,17 @@
-*.json
-*.ods 
+credentials.json
+token.json
+client_secret.json
+*.ods
 *.csv
+preview_*.json
+preview_*.csv
+warnings.json
 
-/__pycache__/ 
-/venv/ 
+/__pycache__/
+/venv/
+
+/web/node_modules/
+/web/.next/
+/web/.env
+/web/.env.local
+.vercel
