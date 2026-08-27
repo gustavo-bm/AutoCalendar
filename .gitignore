@@ -1,17 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Secrets (CLI + Google)
 credentials.json
 token.json
 client_secret.json
+
+# Planilhas e saídas locais
 *.ods
 *.csv
 preview_*.json
 preview_*.csv
 warnings.json
 
-/__pycache__/
-/venv/
+# Node / Next
+node_modules/
+.next/
+out/
+*.tsbuildinfo
 
-/web/node_modules/
-/web/.next/
-/web/.env
-/web/.env.local
+# Env (nunca commitar secrets)
+.env
+.env.*
+!.env.example
+
+# Vercel
 .vercel
+
+# OS
+.DS_Store
+Thumbs.db

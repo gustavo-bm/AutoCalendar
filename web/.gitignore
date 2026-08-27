@@ -1,6 +1,12 @@
-.vercel
+# See https://nextjs.org/docs/app/getting-started/installation
+.next/
+out/
+node_modules/
+*.tsbuildinfo
+
 .env
+.env.*
+!.env.example
 
-node_modules
-
-package-lock.json
+.vercel
+.DS_Store

@@ -32,9 +32,9 @@ from event_filter import (
 # Default paths
 # ─────────────────────────────────────────────────────────
 DEFAULT_ODS_FILE = "2026-2027 - Planification des cours Brest.ods"
-PREVIEW_CSV = "preview_schedule.csv"
-PREVIEW_JSON = "preview_events.json"
-WARNINGS_FILE = "warnings.json"
+PREVIEW_CSV = "preview/preview_schedule.csv"
+PREVIEW_JSON = "preview/preview_events.json"
+WARNINGS_FILE = "preview/warnings.json"
 
 
 def print_banner():
