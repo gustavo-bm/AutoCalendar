@@ -21,9 +21,9 @@ export default function Home() {
 
   const [step, setStep] = useState<Step>("upload");
   const [fileName, setFileName] = useState<string | null>(null);
-  const [option, setOption] = useState("ROB");
+  const [option, setOption] = useState("CSN");
   const [calendarName, setCalendarName] = useState(
-    CALENDAR_NAME_TEMPLATE.replace("{option}", "ROB"),
+    CALENDAR_NAME_TEMPLATE.replace("{option}", "CSN"),
   );
   const [weekLimit, setWeekLimit] = useState(0);
   const [events, setEvents] = useState<ScheduleEvent[]>([]);
