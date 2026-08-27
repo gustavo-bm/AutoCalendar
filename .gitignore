@@ -12,6 +12,8 @@ client_secret.json
 # Planilhas e saídas locais
 *.ods
 *.csv
+preview/
+data/
 preview_*.json
 preview_*.csv
 warnings.json
