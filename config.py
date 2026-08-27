@@ -107,8 +107,8 @@ CALENDAR_NAME_TEMPLATE = "ENSTA - FISE2A - {option}"
 # Google Calendar API scopes
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
-# OAuth credentials file path
-CREDENTIALS_FILE = "credentials.json"
+# OAuth credentials file path (Desktop App client secret)
+CREDENTIALS_FILE = "desktop_app_client_secret.json"
 TOKEN_FILE = "token.json"
 
 # Safety threshold for bulk deletion confirmation

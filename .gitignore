@@ -7,7 +7,7 @@ venv/
 # Secrets (CLI + Google)
 credentials.json
 token.json
-client_secret.json
+desktop_app_client_secret.json
 
 # Planilhas e saídas locais
 *.ods
