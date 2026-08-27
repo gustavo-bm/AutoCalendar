@@ -11,21 +11,23 @@ export function PreviewTable({ events }: PreviewTableProps) {
 
   if (display.length === 0) return null;
 
+  const total = events.filter((e) => !e.isVacation).length;
+
   return (
     <div className="neon-border overflow-hidden rounded-2xl bg-[var(--surface)]">
       <div className="border-b border-[var(--border)] px-5 py-3">
         <h3 className="text-sm font-semibold">
-          Prévia — {events.filter((e) => !e.isVacation).length} eventos
-          {events.filter((e) => !e.isVacation).length > 50 && " (mostrando 50)"}
+          Aperçu — {total} cours
+          {total > 50 && " (50 premiers)"}
         </h3>
       </div>
       <div className="max-h-72 overflow-auto">
         <table className="w-full text-left text-sm">
           <thead className="sticky top-0 bg-[var(--surface-2)] text-[var(--muted)]">
             <tr>
-              <th className="px-4 py-2 font-medium">Data</th>
-              <th className="px-4 py-2 font-medium">Horário</th>
-              <th className="px-4 py-2 font-medium">Matéria</th>
+              <th className="px-4 py-2 font-medium">Date</th>
+              <th className="px-4 py-2 font-medium">Horaire</th>
+              <th className="px-4 py-2 font-medium">Matière</th>
             </tr>
           </thead>
           <tbody>

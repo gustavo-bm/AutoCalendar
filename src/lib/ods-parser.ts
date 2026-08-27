@@ -65,7 +65,7 @@ export class ODSParser {
   private async loadSheet(): Promise<Record<string, unknown>> {
     const zip = await JSZip.loadAsync(this.buffer);
     const content = await zip.file("content.xml")?.async("text");
-    if (!content) throw new Error("content.xml não encontrado no ODS");
+    if (!content) throw new Error("Ce fichier n’est pas un ODS valide.");
 
     const parser = new XMLParser({
       ignoreAttributes: false,
@@ -81,9 +81,8 @@ export class ODSParser {
     );
 
     if (!sheet) {
-      const names = tables.map((t) => t["@_table:name"]).join(", ");
       throw new Error(
-        `Aba '${TARGET_SHEET_NAME}' não encontrada. Abas: ${names || "nenhuma"}`,
+        `Feuille « ${TARGET_SHEET_NAME} » introuvable dans ce fichier.`,
       );
     }
 

@@ -4,7 +4,7 @@ import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "AutoCalendar — ENSTA FISE 2A",
-  description: "Sincronize seu emploi du temps ENSTA com Google Calendar",
+  description: "Mettez votre emploi du temps ENSTA dans Google Agenda",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt">
+    <html lang="fr">
       <body className="antialiased">
         <Providers>{children}</Providers>
       </body>

@@ -13,7 +13,7 @@ export function filterScheduleForOption(
   selectedOption: string,
 ): ScheduleEvent[] {
   if (!VALID_OPTIONS.includes(selectedOption as (typeof VALID_OPTIONS)[number])) {
-    throw new Error(`Opção inválida: ${selectedOption}`);
+    throw new Error(`Option inconnue : ${selectedOption}`);
   }
 
   const directEvents: ScheduleEvent[] = [];

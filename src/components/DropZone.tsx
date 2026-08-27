@@ -15,7 +15,7 @@ export function DropZone({ onFile, fileName }: DropZoneProps) {
       e.preventDefault();
       setDragging(false);
       const file = e.dataTransfer.files[0];
-      if (file?.name.endsWith(".ods")) {
+      if (file?.name.toLowerCase().endsWith(".ods")) {
         onFile(file);
       }
     },
@@ -63,10 +63,10 @@ export function DropZone({ onFile, fileName }: DropZoneProps) {
       ) : (
         <>
           <p className="text-base font-medium">
-            Arraste seu arquivo <span className="neon-text">.ods</span> aqui
+            Déposez le fichier <span className="neon-text">.ods</span> ici
           </p>
           <p className="mt-1 text-sm text-[var(--muted)]">
-            ou clique para selecionar
+            ou cliquez pour le choisir
           </p>
         </>
       )}

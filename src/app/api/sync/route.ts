@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
   if (!session?.accessToken) {
     return NextResponse.json(
-      { error: "Conecte sua conta Google primeiro." },
+      { error: "Connectez d’abord votre compte Google." },
       { status: 401 },
     );
   }
@@ -19,14 +19,14 @@ export async function POST(req: NextRequest) {
 
     if (!body.events?.length) {
       return NextResponse.json(
-        { error: "Nenhum evento para sincronizar." },
+        { error: "Aucun cours à synchroniser." },
         { status: 400 },
       );
     }
 
     if (!body.calendarName?.trim()) {
       return NextResponse.json(
-        { error: "Nome do calendário obrigatório." },
+        { error: "Indiquez un nom de calendrier." },
         { status: 400 },
       );
     }
@@ -40,14 +40,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ stats });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Erro desconhecido";
+    const message = err instanceof Error ? err.message : "Erreur inconnue";
 
     if (message.startsWith("BULK_DELETE:")) {
       const count = message.split(":")[1];
       return NextResponse.json(
         {
           error: "bulk_delete",
-          message: `${count} eventos obsoletos seriam removidos.`,
+          message: `${count} anciens cours seraient supprimés.`,
           count: parseInt(count, 10),
         },
         { status: 409 },

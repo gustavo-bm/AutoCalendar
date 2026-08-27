@@ -126,11 +126,11 @@ async function getOrCreateCalendar(
     requestBody: {
       summary: calendarName,
       timeZone: "Europe/Paris",
-      description: "Emploi du temps gerado por AutoCalendar",
+      description: "Emploi du temps généré par AutoCalendar",
     },
   });
 
-  if (!created.data.id) throw new Error("Falha ao criar calendário");
+  if (!created.data.id) throw new Error("Impossible de créer le calendrier.");
   return created.data.id;
 }
 
