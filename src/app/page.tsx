@@ -29,9 +29,11 @@ interface PersistedState {
 
 function persistState(data: PersistedState) {
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch {
-    /* quota exceeded — ignore */
+    const json = JSON.stringify(data);
+    sessionStorage.setItem(STORAGE_KEY, json);
+    console.log(`[AutoCalendar] persisted ${data.events.length} events (${json.length} chars)`);
+  } catch (e) {
+    console.error("[AutoCalendar] persistState failed:", e);
   }
 }
 
@@ -90,9 +92,16 @@ export default function Home() {
     if (didRestore.current) return;
     didRestore.current = true;
 
-    const saved = loadPersistedState();
-    if (!saved) return;
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    console.log("[AutoCalendar] restore check — raw in sessionStorage:", raw ? `${raw.length} chars` : "null");
 
+    const saved = loadPersistedState();
+    if (!saved) {
+      console.log("[AutoCalendar] nothing to restore");
+      return;
+    }
+
+    console.log(`[AutoCalendar] restoring ${saved.events.length} events, calendar: ${saved.calendarName}`);
     setEvents(saved.events);
     setPreview(
       saved.events.map((e) => ({ ...e, title: classifyEventTitle(e) })),
@@ -188,7 +197,7 @@ export default function Home() {
           option,
           fileName,
         });
-        signIn("google");
+        signIn("google", { callbackUrl: "/" });
         return;
       }
 
@@ -230,7 +239,7 @@ export default function Home() {
         option,
         fileName,
       });
-      signIn("google");
+      signIn("google", { callbackUrl: "/" });
       return;
     }
 
