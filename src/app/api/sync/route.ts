@@ -9,7 +9,19 @@ export async function POST(req: NextRequest) {
 
   if (!session?.accessToken) {
     return NextResponse.json(
-      { error: "Connectez d’abord votre compte Google." },
+      { error: "Connectez d'abord votre compte Google.", code: "NO_TOKEN" },
+      { status: 401 },
+    );
+  }
+
+  // Check if the token refresh failed (flagged by auth.ts)
+  const sessionError = (session as unknown as Record<string, unknown>).error;
+  if (sessionError) {
+    return NextResponse.json(
+      {
+        error: "Votre session a expiré. Veuillez vous reconnecter.",
+        code: "SESSION_EXPIRED",
+      },
       { status: 401 },
     );
   }
@@ -54,6 +66,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Detect Google API auth errors
+    const code = (err as { code?: number }).code;
+    if (code === 401 || code === 403) {
+      return NextResponse.json(
+        {
+          error: "Accès refusé par Google. Reconnectez-vous et réessayez.",
+          code: "GOOGLE_AUTH_ERROR",
+        },
+        { status: 401 },
+      );
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+

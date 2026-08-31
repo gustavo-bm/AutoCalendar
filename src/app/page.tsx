@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { DropZone } from "@/components/DropZone";
 import { OptionSelector } from "@/components/OptionSelector";
@@ -16,8 +16,48 @@ const SHAREPOINT_URL =
 
 type Step = "upload" | "preview" | "syncing" | "done";
 
+const STORAGE_KEY = "autocalendar_pending_sync";
+
+/** Save parsed events to sessionStorage so they survive OAuth redirects. */
+function savePendingSync(data: {
+  events: ScheduleEvent[];
+  calendarName: string;
+  option: string;
+  fileName: string | null;
+}) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    /* quota exceeded — ignore */
+  }
+}
+
+/** Restore pending sync data after an OAuth redirect. */
+function loadPendingSync(): {
+  events: ScheduleEvent[];
+  calendarName: string;
+  option: string;
+  fileName: string | null;
+} | null {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function clearPendingSync() {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 export default function Home() {
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
 
   const [step, setStep] = useState<Step>("upload");
   const [fileName, setFileName] = useState<string | null>(null);
@@ -32,6 +72,35 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<SyncStats | null>(null);
   const [bulkDeletePending, setBulkDeletePending] = useState(false);
+  const [autoSyncPending, setAutoSyncPending] = useState(false);
+
+  // Restore state after OAuth redirect
+  useEffect(() => {
+    if (sessionStatus !== "authenticated") return;
+
+    const pending = loadPendingSync();
+    if (!pending || !pending.events.length) return;
+
+    // Restore the parsed events
+    setEvents(pending.events);
+    setPreview(
+      pending.events.map((e) => ({ ...e, title: classifyEventTitle(e) })),
+    );
+    setCalendarName(pending.calendarName);
+    setOption(pending.option);
+    setFileName(pending.fileName);
+    setStep("preview");
+    setAutoSyncPending(true);
+  }, [sessionStatus]);
+
+  // Auto-sync after restoring from OAuth redirect
+  useEffect(() => {
+    if (!autoSyncPending || !session?.accessToken || events.length === 0) return;
+    setAutoSyncPending(false);
+    clearPendingSync();
+    handleSyncInternal(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSyncPending, session?.accessToken, events]);
 
   const handleOptionChange = (opt: string) => {
     setOption(opt);
@@ -69,12 +138,7 @@ export default function Home() {
     [option, weekLimit],
   );
 
-  const handleSync = async (confirmBulkDelete = false) => {
-    if (!session?.accessToken) {
-      signIn("google");
-      return;
-    }
-
+  const handleSyncInternal = async (confirmBulkDelete: boolean) => {
     setStep("syncing");
     setError(null);
     setBulkDeletePending(false);
@@ -90,20 +154,35 @@ export default function Home() {
         }),
       });
 
-      const data = await res.json();
+      let data: Record<string, unknown>;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(
+          `Le serveur a répondu avec le statut ${res.status}. Vérifiez la configuration du déploiement.`,
+        );
+      }
+
+      // Auth error → save state and re-login
+      if (res.status === 401) {
+        savePendingSync({ events, calendarName, option, fileName });
+        signIn("google");
+        return;
+      }
 
       if (res.status === 409 && data.error === "bulk_delete") {
         setBulkDeletePending(true);
         setStep("preview");
-        setError(data.message);
+        setError(data.message as string);
         return;
       }
 
       if (!res.ok) {
-        throw new Error(data.error ?? "Échec de la synchronisation.");
+        throw new Error((data.error as string) ?? `Erreur ${res.status} lors de la synchronisation.`);
       }
 
-      setStats(data.stats);
+      clearPendingSync();
+      setStats(data.stats as SyncStats);
       setStep("done");
     } catch (err) {
       setError(
@@ -111,6 +190,24 @@ export default function Home() {
       );
       setStep("preview");
     }
+  };
+
+  const handleSync = async (confirmBulkDelete = false) => {
+    if (!session?.accessToken) {
+      // Save state before redirecting to OAuth
+      savePendingSync({ events, calendarName, option, fileName });
+      signIn("google");
+      return;
+    }
+
+    if (events.length === 0) {
+      setError(
+        "Aucun cours en mémoire. Veuillez ré-importer le fichier ODS avant de synchroniser.",
+      );
+      return;
+    }
+
+    await handleSyncInternal(confirmBulkDelete);
   };
 
   const reset = () => {
@@ -121,6 +218,7 @@ export default function Home() {
     setStats(null);
     setError(null);
     setBulkDeletePending(false);
+    clearPendingSync();
   };
 
   return (
@@ -182,7 +280,7 @@ export default function Home() {
 
           <section>
             <label className="mb-2 block text-sm font-medium text-[var(--muted)]">
-              Nombre de semaines (0 = toute l’année) — pour tester
+              Nombre de semaines (0 = toute l'année) — pour tester
             </label>
             <input
               type="number"
@@ -255,7 +353,7 @@ export default function Home() {
       {step === "done" && stats && (
         <div className="neon-border rounded-2xl bg-[var(--surface)] p-8 text-center">
           <p className="text-2xl">✅</p>
-          <h2 className="mt-3 text-xl font-bold neon-text">C’est fait !</h2>
+          <h2 className="mt-3 text-xl font-bold neon-text">C'est fait !</h2>
           <div className="mt-4 space-y-1 text-sm text-[var(--muted)]">
             <p>
               {stats.created} créés · {stats.updated} mis à jour
@@ -278,7 +376,7 @@ export default function Home() {
       )}
 
       <footer className="mt-16 text-center text-xs text-[var(--muted)]">
-        Le fichier ODS reste sur votre ordinateur. Il n’est pas envoyé sur nos
+        Le fichier ODS reste sur votre ordinateur. Il n'est pas envoyé sur nos
         serveurs.
       </footer>
     </main>
