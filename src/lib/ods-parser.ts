@@ -121,13 +121,15 @@ export class ODSParser {
       : [];
 
     for (const p of ps) {
-      if (typeof p === "string") {
-        texts.push(p);
+      if (typeof p === "string" || typeof p === "number" || typeof p === "boolean") {
+        texts.push(String(p));
       } else if (p && typeof p === "object") {
         const rec = p as Record<string, unknown>;
         if (rec["#text"]) texts.push(String(rec["#text"]));
         for (const v of Object.values(rec)) {
-          if (typeof v === "string") texts.push(v);
+          if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") {
+            texts.push(String(v));
+          }
         }
       }
     }
@@ -314,7 +316,7 @@ export class ODSParser {
     if (!lower) return null;
 
     const match = lower.match(
-      /(?:lundi|mardi|mercredi|jeudi|vendredi)\s+(\d{1,2})\s+(\w+)/,
+      /(?:lundi|mardi|mercredi|jeudi|vendredi)\s+(\d{1,2})\s+([a-zà-ÿ]+)/i,
     );
     if (!match) {
       this.warnings.push({

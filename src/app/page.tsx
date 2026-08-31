@@ -127,12 +127,33 @@ export default function Home() {
 
       try {
         const buffer = await file.arrayBuffer();
+        console.log(`[AutoCalendar] file loaded: ${file.name} (${buffer.byteLength} bytes)`);
+
         const result = await parseOdsFile(buffer, option);
+        console.log(`[AutoCalendar] parse result: ${result.events.length} events, ${result.warnings.length} warnings, grid ${result.grid.length} rows`);
+
+        if (result.warnings.length > 0) {
+          console.warn("[AutoCalendar] parse warnings:", result.warnings);
+        }
+
         let filtered = result.events;
 
         if (weekLimit > 0) {
           filtered = limitToWeeks(filtered, weekLimit);
+          console.log(`[AutoCalendar] after weekLimit(${weekLimit}): ${filtered.length} events`);
         }
+
+        if (filtered.length === 0) {
+          setError(
+            `Aucun cours trouvé pour l'option « ${option} ». ` +
+            `Le parser a extrait ${result.events.length} événement(s) au total. ` +
+            `Vérifiez que le fichier est bien au format ODS et contient la feuille FISE_2A.`,
+          );
+          setLoading(false);
+          return;
+        }
+
+        console.log(`[AutoCalendar] ${filtered.length} events ready, first: ${JSON.stringify(filtered[0])}`);
 
         setEvents(filtered);
         setPreview(
@@ -148,6 +169,7 @@ export default function Home() {
           fileName: file.name,
         });
       } catch (err) {
+        console.error("[AutoCalendar] handleFile error:", err);
         setError(
           err instanceof Error
             ? err.message
