@@ -405,9 +405,13 @@ export default function Home() {
 
       {step === "syncing" && (
         <div className="py-20 text-center">
-          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[var(--neon)] border-t-transparent" />
+          <div className="mx-auto mb-6 h-12 w-12 animate-spin rounded-full border-4 border-[var(--neon)] border-t-transparent" />
+          <h2 className="mb-2 text-lg font-semibold text-white">
+            Synchronisation en cours…
+          </h2>
           <p className="text-sm text-[var(--muted)]">
-            Synchronisation avec Google Agenda…
+            Cela peut prendre quelques minutes. <br />
+            <strong className="text-red-400">Ne fermez pas cette page.</strong>
           </p>
         </div>
       )}
